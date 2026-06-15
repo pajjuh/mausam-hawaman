@@ -1,0 +1,60 @@
+name: mausam
+description: "Mausam Hawaman — India Hyperlocal Weather App"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Navigation
+  go_router: ^15.1.2
+
+  # HTTP & Networking
+  dio: ^5.7.0
+  flutter_cache_manager: ^3.4.1
+
+  # Local Database (Drift / SQLite)
+  drift: ^2.25.0
+  sqlite3_flutter_libs: ^0.5.30
+  path_provider: ^2.1.5
+  path: ^1.9.1
+
+  # Location Services
+  geolocator: ^14.0.0
+  geocoding: ^3.0.0
+
+  # UI & Design
+  google_fonts: ^6.2.1
+  fl_chart: ^0.70.2
+  intl: ^0.20.2
+
+  # Utilities
+  connectivity_plus: ^6.1.4
+  shared_preferences: ^2.5.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+  # Code Generation
+  drift_dev: ^2.25.0
+  build_runner: ^2.4.15
+  riverpod_generator: ^2.6.5
+  custom_lint: ^0.7.5
+  riverpod_lint: ^2.6.5
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icons/
+    - assets/images/
