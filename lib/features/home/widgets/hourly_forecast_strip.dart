@@ -6,6 +6,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/weather_utils.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../data/models/hourly_forecast.dart';
+import '../../confidence/confidence_badge.dart';
 
 /// Horizontal scrolling hourly forecast strip with temperature curve (F3)
 class HourlyForecastStrip extends StatelessWidget {
@@ -51,7 +52,7 @@ class HourlyForecastStrip extends StatelessWidget {
 
         // ── Hourly Cards ──
         SizedBox(
-          height: 140,
+          height: 165,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -176,7 +177,7 @@ class HourlyForecastStrip extends StatelessWidget {
             ),
 
             // Rain probability
-            if (hasRain)
+            if (hasRain) ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -193,9 +194,11 @@ class HourlyForecastStrip extends StatelessWidget {
                     softWrap: true,
                   ),
                 ],
-              )
-            else
-              const SizedBox(height: 14),
+              ),
+              const SizedBox(height: 4),
+              ConfidenceBadge(confidence: forecast.confidence),
+            ] else
+              const SizedBox(height: 32),
           ],
         ),
       ),

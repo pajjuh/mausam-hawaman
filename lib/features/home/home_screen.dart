@@ -10,6 +10,8 @@ import 'widgets/current_weather_card.dart';
 import 'widgets/hourly_forecast_strip.dart';
 import 'widgets/daily_forecast_card.dart';
 import 'widgets/update_banner.dart';
+import '../aqi/widgets/aqi_card.dart';
+import '../radar/widgets/radar_map_card.dart';
 
 /// Main home screen assembling all weather widgets (F2, F3, F4, F13)
 class HomeScreen extends ConsumerWidget {
@@ -139,9 +141,17 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 24),
 
+                                // F7: Air Quality
+                                const AqiCard(),
+                                const SizedBox(height: 24),
+
                                 // F3: Hourly Forecast
                                 HourlyForecastStrip(
                                     forecasts: weather.hourly),
+                                const SizedBox(height: 24),
+
+                                // F6: Rain Radar
+                                const RadarMapCard(),
                                 const SizedBox(height: 24),
 
                                 // F4: Daily Forecast

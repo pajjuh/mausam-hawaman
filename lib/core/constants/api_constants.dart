@@ -63,4 +63,12 @@ class ApiConstants {
   // ── Open-Meteo Air Quality API (Phase 2) ──
   static const String airQualityEndpoint =
       'https://air-quality-api.open-meteo.com/v1/air-quality';
+      
+  /// Models for Confidence Engine (Phase 2)
+  static const List<String> confidenceModels = [
+    'best_match',
+    'gfs_seamless',
+    'icon_seamless',
+    'ecmwf_ifs04'
+  ];
 }

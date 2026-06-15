@@ -9,6 +9,10 @@ import '../data/repositories/location_repository.dart';
 import '../data/repositories/weather_repository.dart';
 import '../data/models/location_data.dart';
 import '../data/models/weather_response.dart';
+import '../data/models/aqi_data.dart';
+import '../data/remote/aqi_api_service.dart';
+import '../data/remote/rainviewer_api_service.dart';
+import '../data/repositories/aqi_repository.dart';
 import '../core/constants/app_constants.dart';
 
 // ═══════════════════════════════════════════════════════
@@ -33,6 +37,14 @@ final githubApiServiceProvider = Provider<GitHubApiService>((ref) {
   return GitHubApiService(dio: DioClient.instance);
 });
 
+final aqiApiServiceProvider = Provider<AqiApiService>((ref) {
+  return AqiApiService(dio: DioClient.instance);
+});
+
+final rainViewerApiServiceProvider = Provider<RainViewerApiService>((ref) {
+  return RainViewerApiService(dio: DioClient.instance);
+});
+
 // ═══════════════════════════════════════════════════════
 //  Repositories
 // ═══════════════════════════════════════════════════════
@@ -48,6 +60,13 @@ final locationRepositoryProvider = Provider<LocationRepository>((ref) {
   return LocationRepository(
     geocodingService: ref.watch(geocodingServiceProvider),
     db: ref.watch(databaseProvider),
+  );
+});
+
+final aqiRepositoryProvider = Provider<AqiRepository>((ref) {
+  return AqiRepository(
+    ref.watch(databaseProvider),
+    ref.watch(aqiApiServiceProvider),
   );
 });
 
@@ -174,6 +193,32 @@ final weatherRefreshProvider = Provider<Future<void> Function()>((ref) {
     );
     ref.invalidate(weatherProvider);
   };
+});
+
+// ═══════════════════════════════════════════════════════
+//  AQI State
+// ═══════════════════════════════════════════════════════
+
+/// Air Quality data for the current location
+final aqiProvider = FutureProvider<AqiData>((ref) async {
+  final locationAsync = ref.watch(currentLocationProvider);
+  
+  final location = locationAsync.valueOrNull;
+  if (location == null) {
+    throw Exception('No location available');
+  }
+
+  final repo = ref.watch(aqiRepositoryProvider);
+  return repo.getAqi(location);
+});
+
+// ═══════════════════════════════════════════════════════
+//  Radar State
+// ═══════════════════════════════════════════════════════
+
+final radarPathProvider = FutureProvider<String?>((ref) async {
+  final service = ref.watch(rainViewerApiServiceProvider);
+  return service.getLatestRadarPath();
 });
 
 // ═══════════════════════════════════════════════════════

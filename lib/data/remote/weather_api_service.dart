@@ -28,6 +28,7 @@ class WeatherApiService {
           'forecast_hours': 48,
           'wind_speed_unit': 'kmh',
           'temperature_unit': 'celsius',
+          'models': ApiConstants.confidenceModels.join(','),
         },
       );
 

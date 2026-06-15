@@ -114,6 +114,25 @@ class AppDatabase extends _$AppDatabase {
           ..where((t) => t.fetchedAt.isSmallerThanValue(cutoff)))
         .go();
   }
+
+  // ── AQI Records Queries ──
+
+  Future<AqiRecord?> getLatestAqi(int locationId) =>
+      (select(aqiRecords)
+            ..where((t) => t.locationId.equals(locationId))
+            ..orderBy([(t) => OrderingTerm.desc(t.fetchedAt)])
+            ..limit(1))
+          .getSingleOrNull();
+
+  Future<int> insertAqiRecord(AqiRecordsCompanion entry) =>
+      into(aqiRecords).insert(entry);
+
+  Future<int> deleteOldAqiRecords(Duration expiry) {
+    final cutoff = DateTime.now().subtract(expiry);
+    return (delete(aqiRecords)
+          ..where((t) => t.fetchedAt.isSmallerThanValue(cutoff)))
+        .go();
+  }
 }
 
 // ── Connection Setup ──
