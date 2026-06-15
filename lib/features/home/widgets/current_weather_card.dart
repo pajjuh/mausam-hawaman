@@ -59,7 +59,7 @@ class CurrentWeatherCard extends StatelessWidget {
   Widget _buildHeader() {
     return Row(
       children: [
-        const Icon(Icons.location_on_rounded, color: Colors.white70, size: 16),
+        const Flexible(child: Icon(Icons.location_on_rounded, color: Colors.white70, size: 16)),
         const SizedBox(width: 4),
         Expanded(
           child: Text(
@@ -70,10 +70,13 @@ class CurrentWeatherCard extends StatelessWidget {
             maxLines: 1,
           ),
         ),
-        Text(
-          'Updated ${DateFormatter.timeAgo(weather.time)}',
-          style: AppTextStyles.labelSmall.copyWith(color: Colors.white60),
-          overflow: TextOverflow.ellipsis,
+        Flexible(
+          child: Text(
+            'Updated ${DateFormatter.timeAgo(weather.time)}',
+            style: AppTextStyles.labelSmall.copyWith(color: Colors.white60),
+            overflow: TextOverflow.ellipsis,
+            softWrap: true,
+          ),
         ),
       ],
     );
@@ -106,10 +109,12 @@ class CurrentWeatherCard extends StatelessWidget {
             ],
           ),
         ),
-        Icon(
-          WeatherUtils.getIcon(weather.weatherCode, isDay: weather.isDay),
-          size: 72,
-          color: Colors.white.withValues(alpha: 0.9),
+        Flexible(
+          child: Icon(
+            WeatherUtils.getIcon(weather.weatherCode, isDay: weather.isDay),
+            size: 72,
+            color: Colors.white.withValues(alpha: 0.9),
+          ),
         ),
       ],
     );
@@ -175,30 +180,32 @@ class CurrentWeatherCard extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: Colors.white70),
+          Flexible(child: Icon(icon, size: 16, color: Colors.white70)),
           const SizedBox(width: 6),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                value,
-                style: AppTextStyles.labelMedium.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  value,
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
                 ),
-                overflow: TextOverflow.ellipsis,
-                softWrap: true,
-              ),
-              Text(
-                label,
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: Colors.white60,
+                Text(
+                  label,
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: Colors.white60,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
                 ),
-                overflow: TextOverflow.ellipsis,
-                softWrap: true,
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

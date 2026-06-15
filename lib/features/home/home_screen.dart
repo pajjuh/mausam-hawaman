@@ -12,17 +12,46 @@ import 'widgets/daily_forecast_card.dart';
 import 'widgets/update_banner.dart';
 import '../aqi/widgets/aqi_card.dart';
 import '../radar/widgets/radar_map_card.dart';
+import '../widgets/widget_service.dart';
+import '../notifications/notification_service.dart';
 
 /// Main home screen assembling all weather widgets (F2, F3, F4, F13)
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Request notification permissions for rain alerts on Android 13+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationService().requestPermissions();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final locationAsync = ref.watch(currentLocationProvider);
     final weatherAsync = ref.watch(weatherProvider);
     final updateAvailable = ref.watch(updateAvailableProvider);
     final versionCheck = ref.watch(versionCheckProvider);
+
+    // Sync data to Android Home Widget when weather updates
+    ref.listen(weatherProvider, (previous, next) {
+      if (next.hasValue && next.value != null && locationAsync.hasValue) {
+        final weather = next.value!;
+        final location = locationAsync.value!;
+        WidgetService.updateHomeWidget(
+          location: location.name,
+          temp: weather.current.temperature.round().toString(),
+          rain: weather.hourly.isNotEmpty ? weather.hourly.first.precipitationProbability.toString() : '0',
+        );
+      }
+    });
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -43,17 +72,25 @@ class HomeScreen extends ConsumerWidget {
                 surfaceTintColor: Colors.transparent,
                 title: Row(
                   children: [
-                    Text(
-                      AppConstants.appName,
-                      style: AppTextStyles.displaySmall.copyWith(
-                        color: AppColors.primary,
+                    Flexible(
+                      child: Text(
+                        AppConstants.appName,
+                        style: AppTextStyles.displaySmall.copyWith(
+                          color: AppColors.primary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
                       ),
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      AppConstants.appTagline,
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textTertiary,
+                    Expanded(
+                      child: Text(
+                        AppConstants.appTagline,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textTertiary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
                       ),
                     ),
                   ],
@@ -194,8 +231,9 @@ class _LocationHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(Icons.location_on_rounded,
-            size: 16, color: AppColors.textTertiary),
+        const Flexible(
+          child: Icon(Icons.location_on_rounded, size: 16, color: AppColors.textTertiary),
+        ),
         const SizedBox(width: 4),
         Expanded(
           child: Text(
@@ -291,70 +329,81 @@ class _SunriseSunsetRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.wb_twilight_rounded,
-                    size: 20, color: Color(0xFFF97316)),
-                const SizedBox(width: 8),
-                Column(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          width: constraints.maxWidth,
+          decoration: BoxDecoration(
+            color: AppColors.card,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Sunrise',
-                      style: AppTextStyles.labelSmall,
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: true,
+                    const Flexible(
+                      child: Icon(Icons.wb_twilight_rounded, size: 20, color: Color(0xFFF97316)),
                     ),
-                    Text(
-                      '${sunrise.hour}:${sunrise.minute.toString().padLeft(2, '0')} AM',
-                      style: AppTextStyles.labelLarge,
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: true,
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Sunrise',
+                            style: AppTextStyles.labelSmall,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: true,
+                          ),
+                          Text(
+                            '${sunrise.hour}:${sunrise.minute.toString().padLeft(2, '0')} AM',
+                            style: AppTextStyles.labelLarge,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: true,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          Container(width: 1, height: 40, color: AppColors.divider),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.nights_stay_rounded,
-                    size: 20, color: Color(0xFF6366F1)),
-                const SizedBox(width: 8),
-                Column(
+              ),
+              Container(width: 1, height: 40, color: AppColors.divider),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Sunset',
-                      style: AppTextStyles.labelSmall,
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: true,
+                    const Flexible(
+                      child: Icon(Icons.nights_stay_rounded, size: 20, color: Color(0xFF6366F1)),
                     ),
-                    Text(
-                      '${sunset.hour > 12 ? sunset.hour - 12 : sunset.hour}:${sunset.minute.toString().padLeft(2, '0')} PM',
-                      style: AppTextStyles.labelLarge,
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: true,
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Sunset',
+                            style: AppTextStyles.labelSmall,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: true,
+                          ),
+                          Text(
+                            '${sunset.hour > 12 ? sunset.hour - 12 : sunset.hour}:${sunset.minute.toString().padLeft(2, '0')} PM',
+                            style: AppTextStyles.labelLarge,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: true,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

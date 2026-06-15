@@ -1,4 +1,4 @@
-import 'package:collection/collection.dart';
+
 import '../../core/constants/api_constants.dart';
 
 /// Single day of forecast data from Open-Meteo

@@ -70,10 +70,12 @@ class _UpdateBannerState extends State<UpdateBanner>
         ),
         child: Row(
           children: [
-            const Icon(
-              Icons.system_update_rounded,
-              color: AppColors.primary,
-              size: 20,
+            const Flexible(
+              child: Icon(
+                Icons.system_update_rounded,
+                color: AppColors.primary,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -89,15 +91,17 @@ class _UpdateBannerState extends State<UpdateBanner>
               ),
             ),
             const SizedBox(width: 8),
-            InkWell(
-              onTap: _dismiss,
-              borderRadius: BorderRadius.circular(20),
-              child: const Padding(
-                padding: EdgeInsets.all(4),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppColors.textTertiary,
-                  size: 18,
+            Flexible(
+              child: InkWell(
+                onTap: _dismiss,
+                borderRadius: BorderRadius.circular(20),
+                child: const Padding(
+                  padding: EdgeInsets.all(4),
+                  child: Icon(
+                    Icons.close_rounded,
+                    color: AppColors.textTertiary,
+                    size: 18,
+                  ),
                 ),
               ),
             ),

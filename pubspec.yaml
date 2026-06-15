@@ -42,6 +42,11 @@ dependencies:
   flutter_map: ^8.3.0
   latlong2: ^0.9.1
   collection: ^1.19.1
+  
+  # Phase 3: Notifications, Background Sync & Widgets
+  home_widget: ^0.7.0
+  workmanager: ^0.9.0+3
+  flutter_local_notifications: ^17.2.3
 
 dev_dependencies:
   flutter_test:

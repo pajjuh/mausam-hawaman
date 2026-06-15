@@ -177,8 +177,10 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.my_location_rounded,
-                      color: AppColors.primary, size: 22),
+                  const Flexible(
+                    child: Icon(Icons.my_location_rounded,
+                        color: AppColors.primary, size: 22),
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -201,8 +203,10 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right_rounded,
-                      color: AppColors.primary),
+                  const Flexible(
+                    child: Icon(Icons.chevron_right_rounded,
+                        color: AppColors.primary),
+                  ),
                 ],
               ),
             ),
@@ -299,8 +303,10 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
         child: Row(
           children: [
-            Icon(icon,
-                size: 22, color: iconColor ?? AppColors.textTertiary),
+            Flexible(
+              child: Icon(icon,
+                  size: 22, color: iconColor ?? AppColors.textTertiary),
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -323,7 +329,7 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
                 ],
               ),
             ),
-            ?trailing,
+            if (trailing != null) Flexible(child: trailing),
           ],
         ),
       ),
