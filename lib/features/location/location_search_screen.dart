@@ -41,13 +41,13 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
     final savedLocations = ref.watch(savedLocationsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
-          color: AppColors.textPrimary,
+          color: Theme.of(context).colorScheme.onSurface,
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -67,12 +67,12 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
               style: AppTextStyles.bodyLarge,
               decoration: InputDecoration(
                 hintText: 'City, village, or PIN code...',
-                prefixIcon: const Icon(Icons.search_rounded,
-                    color: AppColors.textTertiary),
+                prefixIcon: Icon(Icons.search_rounded,
+                    color: Theme.of(context).colorScheme.outline),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear_rounded,
-                            color: AppColors.textTertiary),
+                        icon: Icon(Icons.clear_rounded,
+                            color: Theme.of(context).colorScheme.outline),
                         onPressed: () {
                           _searchController.clear();
                           ref.read(searchQueryProvider.notifier).state = '';
@@ -114,8 +114,8 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.location_off_rounded,
-                    size: 48, color: AppColors.textTertiary),
+                Icon(Icons.location_off_rounded,
+                    size: 48, color: Theme.of(context).colorScheme.outline),
                 const SizedBox(height: 12),
                 Text(
                   'No locations found',
@@ -255,7 +255,7 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
                         : Icons.location_on_outlined,
                     iconColor: location.isDefault
                         ? AppColors.warningLight
-                        : AppColors.textTertiary,
+                        : Theme.of(context).colorScheme.outline,
                     title: location.name,
                     subtitle: location.displayName,
                     onTap: () {
@@ -267,8 +267,8 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
                     trailing: location.isDefault
                         ? null
                         : IconButton(
-                            icon: const Icon(Icons.delete_outline_rounded,
-                                size: 20, color: AppColors.textTertiary),
+                            icon: Icon(Icons.delete_outline_rounded,
+                                size: 20, color: Theme.of(context).colorScheme.outline),
                             onPressed: () async {
                               if (location.id != null) {
                                 final repo = ref.read(
@@ -305,7 +305,7 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
           children: [
             Flexible(
               child: Icon(icon,
-                  size: 22, color: iconColor ?? AppColors.textTertiary),
+                  size: 22, color: iconColor ?? Theme.of(context).colorScheme.outline),
             ),
             const SizedBox(width: 12),
             Expanded(

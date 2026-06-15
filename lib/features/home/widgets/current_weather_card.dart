@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -110,10 +111,11 @@ class CurrentWeatherCard extends StatelessWidget {
           ),
         ),
         Flexible(
-          child: Icon(
-            WeatherUtils.getIcon(weather.weatherCode, isDay: weather.isDay),
-            size: 72,
-            color: Colors.white.withValues(alpha: 0.9),
+          child: Lottie.asset(
+            WeatherUtils.getLottieAsset(weather.weatherCode, isDay: weather.isDay),
+            width: 120,
+            height: 120,
+            fit: BoxFit.contain,
           ),
         ),
       ],

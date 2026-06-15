@@ -58,6 +58,8 @@ class MausamApp extends StatelessWidget {
       title: 'Mausam - Hawaman',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
       routerConfig: AppRouter.router,
     );
   }

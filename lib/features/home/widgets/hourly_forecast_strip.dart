@@ -26,8 +26,8 @@ class HourlyForecastStrip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              const Icon(Icons.schedule_rounded,
-                  size: 18, color: AppColors.textSecondary),
+              Icon(Icons.schedule_rounded,
+                  size: 18, color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: 6),
               Text(
                 '48-Hour Forecast',
@@ -57,8 +57,9 @@ class HourlyForecastStrip extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             itemCount: forecasts.length,
-            itemBuilder: (context, index) =>
-                _buildHourCard(forecasts[index], index),
+            itemBuilder: (context, index) {
+              return _buildHourCard(context, forecasts[index], index);
+            },
           ),
         ),
       ],
@@ -127,7 +128,7 @@ class HourlyForecastStrip extends StatelessWidget {
     );
   }
 
-  Widget _buildHourCard(HourlyForecast forecast, int index) {
+  Widget _buildHourCard(BuildContext context, HourlyForecast forecast, int index) {
     final isNow = DateFormatter.isCurrentHour(forecast.time);
     final hasRain = forecast.precipitationProbability > 30;
 
@@ -135,10 +136,10 @@ class HourlyForecastStrip extends StatelessWidget {
       width: 72,
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: isNow ? AppColors.primarySurface : AppColors.card,
+        color: isNow ? AppColors.primarySurface : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isNow ? AppColors.primary : AppColors.border,
+          color: isNow ? AppColors.primary : Theme.of(context).colorScheme.outlineVariant,
           width: isNow ? 2 : 1,
         ),
       ),
@@ -151,7 +152,7 @@ class HourlyForecastStrip extends StatelessWidget {
             Text(
               isNow ? 'Now' : DateFormatter.shortTime(forecast.time),
               style: AppTextStyles.labelSmall.copyWith(
-                color: isNow ? AppColors.primary : AppColors.textSecondary,
+                color: isNow ? AppColors.primary : Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: isNow ? FontWeight.w700 : FontWeight.w500,
               ),
               overflow: TextOverflow.ellipsis,
@@ -170,7 +171,7 @@ class HourlyForecastStrip extends StatelessWidget {
             Text(
               '${forecast.temperature.round()}°',
               style: AppTextStyles.labelLarge.copyWith(
-                color: isNow ? AppColors.primary : AppColors.textPrimary,
+                color: isNow ? AppColors.primary : Theme.of(context).colorScheme.onSurface,
               ),
               overflow: TextOverflow.ellipsis,
               softWrap: true,

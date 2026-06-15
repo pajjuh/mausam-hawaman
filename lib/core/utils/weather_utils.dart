@@ -106,6 +106,27 @@ class WeatherUtils {
     return 'Extreme';
   }
 
+  /// Returns the path to the corresponding Lottie animation asset
+  static String getLottieAsset(int code, {bool isDay = true}) {
+    return switch (code) {
+      0 => isDay ? 'assets/lottie/clear-day.json' : 'assets/lottie/clear-night.json',
+      1 => isDay ? 'assets/lottie/clear-day.json' : 'assets/lottie/clear-night.json',
+      2 => isDay ? 'assets/lottie/partly-cloudy-day.json' : 'assets/lottie/partly-cloudy-night.json',
+      3 => 'assets/lottie/overcast.json',
+      45 || 48 => 'assets/lottie/cloudy.json', // using cloudy as a fallback for fog
+      51 || 53 || 55 => 'assets/lottie/drizzle.json',
+      56 || 57 => 'assets/lottie/drizzle.json',
+      61 || 63 || 65 => 'assets/lottie/rain.json',
+      66 || 67 => 'assets/lottie/rain.json',
+      71 || 73 || 75 || 77 => 'assets/lottie/snow.json',
+      80 || 81 || 82 => 'assets/lottie/rain.json',
+      85 || 86 => 'assets/lottie/snow.json',
+      95 => isDay ? 'assets/lottie/thunderstorms-day.json' : 'assets/lottie/thunderstorms-night.json',
+      96 || 99 => isDay ? 'assets/lottie/thunderstorms-day.json' : 'assets/lottie/thunderstorms-night.json',
+      _ => isDay ? 'assets/lottie/clear-day.json' : 'assets/lottie/clear-night.json',
+    };
+  }
+
   /// Returns UV Index color
   static Color getUvColor(double uvIndex) {
     if (uvIndex <= 2) return AppColors.success;

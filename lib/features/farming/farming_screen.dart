@@ -18,9 +18,9 @@ class FarmingScreen extends ConsumerWidget {
     final weatherAsync = ref.watch(weatherProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         surfaceTintColor: Colors.transparent,
         title: Text(
           'Farming Mode',
@@ -53,7 +53,7 @@ class FarmingScreen extends ConsumerWidget {
                               children: [
                                 Text(
                                   location.shortDisplayName,
-                                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                                  style: AppTextStyles.bodyMedium.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                                   overflow: TextOverflow.ellipsis,
                                   softWrap: true,
                                 ),

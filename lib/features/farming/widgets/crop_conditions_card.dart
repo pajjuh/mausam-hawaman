@@ -56,7 +56,7 @@ class _CropConditionsCardState extends State<CropConditionsCard> {
       case 'Stressful':
         return AppColors.danger;
       default:
-        return AppColors.textTertiary;
+        return Theme.of(context).colorScheme.outline;
     }
   }
 
@@ -71,9 +71,9 @@ class _CropConditionsCardState extends State<CropConditionsCard> {
           padding: const EdgeInsets.all(16),
           width: constraints.maxWidth,
           decoration: BoxDecoration(
-            color: AppColors.card,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

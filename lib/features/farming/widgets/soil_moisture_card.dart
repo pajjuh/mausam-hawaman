@@ -31,7 +31,7 @@ class SoilMoistureCard extends StatelessWidget {
     }
   }
 
-  Color _getLevelColor(String level) {
+  Color _getLevelColor(BuildContext context, String level) {
     switch (level) {
       case 'Waterlogged':
         return AppColors.primary;
@@ -42,7 +42,7 @@ class SoilMoistureCard extends StatelessWidget {
       case 'Low':
         return AppColors.danger;
       default:
-        return AppColors.textTertiary;
+        return Theme.of(context).colorScheme.outline;
     }
   }
 
@@ -50,7 +50,7 @@ class SoilMoistureCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final level = _getMoistureLevel();
     final recommendation = _getRecommendation(level);
-    final color = _getLevelColor(level);
+    final color = _getLevelColor(context, level);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -58,9 +58,9 @@ class SoilMoistureCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           width: constraints.maxWidth,
           decoration: BoxDecoration(
-            color: AppColors.card,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
           ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

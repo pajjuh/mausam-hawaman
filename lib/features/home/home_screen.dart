@@ -54,7 +54,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: RefreshIndicator(
           color: AppColors.primary,
@@ -68,7 +68,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               SliverAppBar(
                 floating: true,
                 snap: true,
-                backgroundColor: AppColors.background,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 surfaceTintColor: Colors.transparent,
                 title: Row(
                   children: [
@@ -87,7 +87,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       child: Text(
                         AppConstants.appTagline,
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textTertiary,
+                          color: Theme.of(context).colorScheme.outline,
                         ),
                         overflow: TextOverflow.ellipsis,
                         softWrap: true,
@@ -98,13 +98,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.search_rounded),
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     tooltip: 'Search location',
                     onPressed: () => context.push('/search'),
                   ),
                   IconButton(
                     icon: const Icon(Icons.my_location_rounded),
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     tooltip: 'Detect location',
                     onPressed: () {
                       ref
@@ -231,8 +231,8 @@ class _LocationHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Flexible(
-          child: Icon(Icons.location_on_rounded, size: 16, color: AppColors.textTertiary),
+        Flexible(
+          child: Icon(Icons.location_on_rounded, size: 16, color: Theme.of(context).colorScheme.outline),
         ),
         const SizedBox(width: 4),
         Expanded(
@@ -288,8 +288,8 @@ class _ErrorState extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.cloud_off_rounded,
-                  size: 48, color: AppColors.textTertiary),
+              Icon(Icons.cloud_off_rounded,
+                  size: 48, color: Theme.of(context).colorScheme.outline),
               const SizedBox(height: 16),
               Text(
                 'Something went wrong',
@@ -335,9 +335,9 @@ class _SunriseSunsetRow extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           width: constraints.maxWidth,
           decoration: BoxDecoration(
-            color: AppColors.card,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
           ),
           child: Row(
             children: [
@@ -370,7 +370,7 @@ class _SunriseSunsetRow extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(width: 1, height: 40, color: AppColors.divider),
+              Container(width: 1, height: 40, color: Theme.of(context).dividerColor),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

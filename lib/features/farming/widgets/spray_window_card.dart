@@ -63,9 +63,9 @@ class SprayWindowCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           width: constraints.maxWidth,
           decoration: BoxDecoration(
-            color: AppColors.card,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
           ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,7 +86,7 @@ class SprayWindowCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Based on wind, humidity, and upcoming rain in the next 4 hours.',
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textTertiary),
+            style: AppTextStyles.bodySmall.copyWith(color: Theme.of(context).colorScheme.outline),
             overflow: TextOverflow.ellipsis,
             softWrap: true,
             maxLines: 2,

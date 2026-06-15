@@ -95,11 +95,11 @@ class _UpdateBannerState extends State<UpdateBanner>
               child: InkWell(
                 onTap: _dismiss,
                 borderRadius: BorderRadius.circular(20),
-                child: const Padding(
-                  padding: EdgeInsets.all(4),
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
                   child: Icon(
                     Icons.close_rounded,
-                    color: AppColors.textTertiary,
+                    color: Theme.of(context).colorScheme.outline,
                     size: 18,
                   ),
                 ),

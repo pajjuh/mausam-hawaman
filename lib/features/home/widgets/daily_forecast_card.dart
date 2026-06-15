@@ -24,8 +24,8 @@ class DailyForecastCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              const Icon(Icons.calendar_today_rounded,
-                  size: 18, color: AppColors.textSecondary),
+              Icon(Icons.calendar_today_rounded,
+                  size: 18, color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(width: 6),
               Text(
                 '7-Day Forecast',
@@ -41,16 +41,16 @@ class DailyForecastCard extends StatelessWidget {
         // ── Day Rows ──
         Container(
           decoration: BoxDecoration(
-            color: AppColors.card,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
           ),
           child: Column(
             children: List.generate(forecasts.length, (index) {
               final isLast = index == forecasts.length - 1;
               return Column(
                 children: [
-                  _buildDayRow(forecasts[index]),
+                  _buildDayRow(context, forecasts[index]),
                   if (!isLast)
                     const Divider(
                         height: 1, indent: 16, endIndent: 16),
@@ -63,7 +63,7 @@ class DailyForecastCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDayRow(DailyForecast forecast) {
+  Widget _buildDayRow(BuildContext context, DailyForecast forecast) {
     final hasRain = forecast.precipitationProbabilityMax > 30;
 
     // Find the overall temp range for the bar chart
@@ -128,7 +128,7 @@ class DailyForecastCard extends StatelessWidget {
             child: Text(
               '${forecast.tempMin.round()}°',
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textTertiary,
+                color: Theme.of(context).colorScheme.outline,
               ),
               textAlign: TextAlign.right,
               overflow: TextOverflow.ellipsis,
@@ -152,7 +152,7 @@ class DailyForecastCard extends StatelessWidget {
                 return Container(
                   height: 6,
                   decoration: BoxDecoration(
-                    color: AppColors.border,
+                    color: Theme.of(context).colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(3),
                   ),
                   child: FractionallySizedBox(
