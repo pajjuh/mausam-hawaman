@@ -54,7 +54,6 @@ class FarmingScreen extends ConsumerWidget {
                                 Text(
                                   location.shortDisplayName,
                                   style: AppTextStyles.bodyMedium.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                                  overflow: TextOverflow.ellipsis,
                                   softWrap: true,
                                 ),
                                 const SizedBox(height: 16),

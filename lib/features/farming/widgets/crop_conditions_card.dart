@@ -65,116 +65,107 @@ class _CropConditionsCardState extends State<CropConditionsCard> {
     final condition = _evaluateCondition();
     final color = _getConditionColor(condition);
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          width: constraints.maxWidth,
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title row with crop dropdown
+          Row(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        const Flexible(child: Icon(Icons.eco_rounded, color: AppColors.success)),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Growing Conditions', 
-                            style: AppTextStyles.displaySmall,
-                            softWrap: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: DropdownButton<String>(
-                      value: _selectedCrop,
-                      isExpanded: true,
-                      icon: const Icon(Icons.arrow_drop_down, color: AppColors.primary),
-                      elevation: 16,
-                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
-                      underline: Container(
-                        height: 2,
-                        color: AppColors.primary,
-                      ),
-                      onChanged: (String? value) {
-                        if (value != null) {
-                          setState(() {
-                            _selectedCrop = value;
-                          });
-                        }
-                      },
-                      items: _crops.map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(
-                            value,
-                            overflow: TextOverflow.ellipsis,
-                            softWrap: true,
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
+              const Icon(Icons.eco_rounded, color: AppColors.success),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Growing Conditions',
+                  style: AppTextStyles.displaySmall,
+                  softWrap: true,
+                ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Current Temp: ${widget.currentWeather.temperature.round()}°C',
-                          style: AppTextStyles.bodyMedium,
-                          overflow: TextOverflow.ellipsis,
-                          softWrap: true,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Condition: $condition',
-                          style: AppTextStyles.displayMedium.copyWith(color: color),
-                          softWrap: true,
-                        ),
-                      ],
-                    ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 120,
+                child: DropdownButton<String>(
+                  value: _selectedCrop,
+                  isExpanded: true,
+                  icon: const Icon(Icons.arrow_drop_down, color: AppColors.primary),
+                  elevation: 16,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
                   ),
-                  Flexible(
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        condition == 'Ideal'
-                            ? Icons.thumb_up_alt_rounded
-                            : condition == 'Stressful'
-                                ? Icons.warning_rounded
-                                : Icons.thumbs_up_down_rounded,
-                        color: color,
-                        size: 32,
-                      ),
-                    ),
+                  underline: Container(
+                    height: 2,
+                    color: AppColors.primary,
                   ),
-                ],
+                  onChanged: (String? value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedCrop = value;
+                      });
+                    }
+                  },
+                  items: _crops.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
             ],
           ),
-        );
-      },
+          const SizedBox(height: 16),
+          // Condition display row
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Current Temp: ${widget.currentWeather.temperature.round()}°C',
+                      style: AppTextStyles.bodyMedium,
+                      softWrap: true,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Condition: $condition',
+                      style: AppTextStyles.displayMedium.copyWith(color: color),
+                      softWrap: true,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  condition == 'Ideal'
+                      ? Icons.thumb_up_alt_rounded
+                      : condition == 'Stressful'
+                          ? Icons.warning_rounded
+                          : Icons.thumbs_up_down_rounded,
+                  color: color,
+                  size: 32,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -52,26 +52,23 @@ class SoilMoistureCard extends StatelessWidget {
     final recommendation = _getRecommendation(level);
     final color = _getLevelColor(context, level);
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          width: constraints.maxWidth,
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-          ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Flexible(child: Icon(Icons.grass_rounded, color: AppColors.success)),
+              const Icon(Icons.grass_rounded, color: AppColors.success),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Soil Moisture Estimate', 
+                  'Soil Moisture Estimate',
                   style: AppTextStyles.displaySmall,
                   softWrap: true,
                 ),
@@ -81,15 +78,13 @@ class SoilMoistureCard extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              Flexible(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.water, color: color, size: 32),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
                 ),
+                child: Icon(Icons.water, color: color, size: 32),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -108,7 +103,6 @@ class SoilMoistureCard extends StatelessWidget {
                     Text(
                       recommendation,
                       style: AppTextStyles.bodyMedium,
-                      overflow: TextOverflow.ellipsis,
                       softWrap: true,
                       maxLines: 3,
                     ),
@@ -119,8 +113,6 @@ class SoilMoistureCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-      },
     );
   }
 }
