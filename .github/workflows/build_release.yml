@@ -12,6 +12,8 @@ jobs:
   build:
     name: Build APK and AAB
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Repository
