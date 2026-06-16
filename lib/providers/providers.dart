@@ -133,8 +133,8 @@ class CurrentLocationNotifier extends StateNotifier<AsyncValue<LocationData>> {
       final repo = _ref.read(locationRepositoryProvider);
       await repo.setDefault(location.id!);
     }
-    // Invalidate weather data so it refetches
-    _ref.invalidate(weatherProvider);
+    // No need to invalidate weatherProvider — it watches currentLocationProvider
+    // and will automatically re-fetch when location state changes.
   }
 
   /// Set location from search result (save and activate)
@@ -143,7 +143,8 @@ class CurrentLocationNotifier extends StateNotifier<AsyncValue<LocationData>> {
       final repo = _ref.read(locationRepositoryProvider);
       final saved = await repo.saveLocation(location, setAsDefault: true);
       state = AsyncValue.data(saved);
-      _ref.invalidate(weatherProvider);
+      // No need to invalidate weatherProvider — it watches currentLocationProvider
+      // and will automatically re-fetch when location state changes.
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

@@ -56,6 +56,53 @@ class FarmingScreen extends ConsumerWidget {
                                   style: AppTextStyles.bodyMedium.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                                   softWrap: true,
                                 ),
+                                const SizedBox(height: 12),
+                                // ── Experimental Warning Banner ──
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.warningSurface,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: AppColors.warningLight.withOpacity(0.5),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.science_rounded,
+                                        color: AppColors.warning,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Experimental Feature',
+                                              style: AppTextStyles.labelMedium.copyWith(
+                                                color: AppColors.warning,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              'Farming data has not been independently verified. Use this section as a general guide only — not as professional agricultural advice.',
+                                              style: AppTextStyles.bodySmall.copyWith(
+                                                color: AppColors.warning.withOpacity(0.85),
+                                                height: 1.4,
+                                              ),
+                                              softWrap: true,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                                 const SizedBox(height: 16),
                                 SprayWindowCard(forecasts: weather.hourly),
                                 const SizedBox(height: 24),
