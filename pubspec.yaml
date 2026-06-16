@@ -49,6 +49,9 @@ dependencies:
   flutter_local_notifications: ^17.2.3
   lottie: ^3.3.3
 
+  # Phase 5: Vaani — Voice Weather
+  flutter_tts: ^4.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
