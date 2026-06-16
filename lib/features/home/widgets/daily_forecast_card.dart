@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/weather_utils.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../../core/utils/unit_converter.dart';
 import '../../../data/models/daily_forecast.dart';
+import '../../../providers/settings_provider.dart';
 
 /// 7-day daily forecast list (F4)
-class DailyForecastCard extends StatelessWidget {
+class DailyForecastCard extends ConsumerWidget {
   final List<DailyForecast> forecasts;
 
   const DailyForecastCard({super.key, required this.forecasts});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (forecasts.isEmpty) return const SizedBox.shrink();
+
+    final settings = ref.watch(settingsProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +55,7 @@ class DailyForecastCard extends StatelessWidget {
               final isLast = index == forecasts.length - 1;
               return Column(
                 children: [
-                  _buildDayRow(context, forecasts[index]),
+                  _buildDayRow(context, forecasts[index], settings),
                   if (!isLast)
                     const Divider(
                         height: 1, indent: 16, endIndent: 16),
@@ -63,7 +68,7 @@ class DailyForecastCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDayRow(BuildContext context, DailyForecast forecast) {
+  Widget _buildDayRow(BuildContext context, DailyForecast forecast, SettingsState settings) {
     final hasRain = forecast.precipitationProbabilityMax > 30;
 
     // Find the overall temp range for the bar chart
@@ -73,7 +78,12 @@ class DailyForecastCard extends StatelessWidget {
       if (f.tempMin < overallMin) overallMin = f.tempMin;
       if (f.tempMax > overallMax) overallMax = f.tempMax;
     }
+    
+    // We compute the raw range to position the bars relatively, but display the converted values
     final range = overallMax - overallMin;
+    
+    final tempMinConverted = UnitConverter.convertTemp(forecast.tempMin, settings.tempUnit);
+    final tempMaxConverted = UnitConverter.convertTemp(forecast.tempMax, settings.tempUnit);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -126,7 +136,7 @@ class DailyForecastCard extends StatelessWidget {
           SizedBox(
             width: 32,
             child: Text(
-              '${forecast.tempMin.round()}°',
+              '$tempMinConverted°',
               style: AppTextStyles.bodyMedium.copyWith(
                 color: Theme.of(context).colorScheme.outline,
               ),
@@ -167,10 +177,9 @@ class DailyForecastCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              WeatherUtils.getTemperatureColor(
-                                  forecast.tempMin),
-                              WeatherUtils.getTemperatureColor(
-                                  forecast.tempMax),
+                              // The color helper expects raw celsius
+                              WeatherUtils.getTemperatureColor(forecast.tempMin),
+                              WeatherUtils.getTemperatureColor(forecast.tempMax),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(3),
@@ -188,7 +197,7 @@ class DailyForecastCard extends StatelessWidget {
           SizedBox(
             width: 32,
             child: Text(
-              '${forecast.tempMax.round()}°',
+              '$tempMaxConverted°',
               style: AppTextStyles.labelLarge,
               textAlign: TextAlign.left,
               overflow: TextOverflow.ellipsis,

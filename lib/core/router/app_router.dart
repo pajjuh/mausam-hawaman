@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/home/home_screen.dart';
 import '../../features/farming/farming_screen.dart';
+import '../../features/settings/settings_page.dart';
 import '../../features/location/location_search_screen.dart';
 import 'main_layout.dart';
 
@@ -13,6 +14,7 @@ class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
   static final _shellNavigatorHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellHome');
   static final _shellNavigatorFarmingKey = GlobalKey<NavigatorState>(debugLabel: 'shellFarming');
+  static final _shellNavigatorSettingsKey = GlobalKey<NavigatorState>(debugLabel: 'shellSettings');
 
   static final GoRouter router = GoRouter(
     initialLocation: '/',
@@ -49,6 +51,22 @@ class AppRouter {
                 pageBuilder: (context, state) => CustomTransitionPage(
                   key: state.pageKey,
                   child: const FarmingScreen(),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorSettingsKey,
+            routes: [
+              GoRoute(
+                path: '/settings',
+                name: 'settings',
+                pageBuilder: (context, state) => CustomTransitionPage(
+                  key: state.pageKey,
+                  child: const SettingsPage(),
                   transitionsBuilder: (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
                   },

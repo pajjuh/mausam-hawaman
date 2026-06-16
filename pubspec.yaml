@@ -51,6 +51,7 @@ dependencies:
 
   # Phase 5: Vaani — Voice Weather
   flutter_tts: ^4.2.0
+  android_intent_plus: ^6.0.0
 
 dev_dependencies:
   flutter_test:

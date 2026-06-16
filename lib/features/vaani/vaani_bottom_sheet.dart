@@ -3,9 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:android_intent_plus/android_intent.dart';
+
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../providers/providers.dart';
+import '../../providers/settings_provider.dart';
 import 'vaani_icon.dart';
 import 'vaani_service.dart';
 import 'vaani_script_builder.dart';
@@ -28,6 +32,12 @@ class _VaaniBottomSheetState extends ConsumerState<VaaniBottomSheet> {
   void initState() {
     super.initState();
     _vaani.state.addListener(_onVaaniStateChanged);
+    
+    // Auto-start speaking using default language from settings
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final settings = ref.read(settingsProvider);
+      _onLanguageSelected(settings.vaaniLang);
+    });
   }
 
   @override
@@ -42,9 +52,10 @@ class _VaaniBottomSheetState extends ConsumerState<VaaniBottomSheet> {
 
   void _onVaaniStateChanged() {
     if (!mounted) return;
-    // When TTS finishes speaking, go back to selection mode
+    // When TTS finishes speaking, close the bottom sheet
     if (_vaani.state.value == VaaniState.idle && _speakingLanguage != null) {
-      setState(() => _speakingLanguage = null);
+      _speakingLanguage = null;
+      Navigator.of(context).pop();
     }
   }
 
@@ -72,12 +83,20 @@ class _VaaniBottomSheetState extends ConsumerState<VaaniBottomSheet> {
       return;
     }
 
+    // Check if we need to show the language pack dialog for kn-IN or mr-IN
+    final shouldProceed = await _checkLanguagePack(langCode);
+    if (!shouldProceed) return;
+
+    final settings = ref.read(settingsProvider);
+
     // Build the voice script
     final script = VaaniScriptBuilder.buildScript(
       langCode: langCode,
       location: location,
       current: weather.current,
       hourly: weather.hourly,
+      tempUnit: settings.tempUnit,
+      windUnit: settings.windUnit,
     );
 
     // Transition to speaking mode
@@ -107,7 +126,69 @@ class _VaaniBottomSheetState extends ConsumerState<VaaniBottomSheet> {
 
   Future<void> _onStop() async {
     await _vaani.stop();
-    setState(() => _speakingLanguage = null);
+    if (mounted && _speakingLanguage != null) {
+      _speakingLanguage = null;
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<bool> _checkLanguagePack(String langCode) async {
+    if (langCode != 'kn-IN' && langCode != 'mr-IN') return true;
+
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'vaani_voice_dialog_shown_$langCode';
+    final hasShown = prefs.getBool(key) ?? false;
+
+    if (hasShown) return true;
+
+    if (!mounted) return false;
+
+    final langName = langCode == 'kn-IN' ? 'Kannada' : 'Marathi';
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'Better Voice Available',
+            style: GoogleFonts.mukta(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'For natural sounding $langName voice, download the language pack from your phone\'s Text-to-Speech settings. This is free and only needs to be done once.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop('continue');
+              },
+              child: const Text('Continue Anyway'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop('download');
+              },
+              child: const Text('Download Voice'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // Only store that we showed it
+    await prefs.setBool(key, true);
+
+    if (result == 'download') {
+      const intent = AndroidIntent(
+        action: 'com.android.settings.TTS_SETTINGS',
+      );
+      intent.launch();
+      // Wait for user to return, dismiss this bottom sheet maybe? Or keep it open.
+      // Usually keeping it open is fine, but they won't hear anything. Let's return false to not speak.
+      return false;
+    }
+
+    // If dismissed or 'continue', we proceed to speak.
+    return true;
   }
 
   @override
@@ -159,65 +240,27 @@ class _VaaniBottomSheetState extends ConsumerState<VaaniBottomSheet> {
             switchOutCurve: Curves.easeIn,
             child: _speakingLanguage != null
                 ? _buildSpeakingMode()
-                : _buildSelectionMode(isDark),
+                : _buildLoadingMode(isDark),
           ),
         ],
       ),
     );
   }
 
-  /// Selection mode — icon, title, subtitle, language chips
-  Widget _buildSelectionMode(bool isDark) {
+  Widget _buildLoadingMode(bool isDark) {
     return Column(
-      key: const ValueKey('selection'),
+      key: const ValueKey('loading'),
       mainAxisSize: MainAxisSize.min,
       children: [
-        // ── Vaani Icon ──
-        VaaniIcon(
-          color: AppColors.primary,
-          size: 48,
-        ),
+        VaaniIcon(color: AppColors.primary, size: 48),
         const SizedBox(height: 12),
-
-        // ── Title: "Vaani" in Mukta bold ──
-        Text(
-          'Vaani',
-          style: GoogleFonts.mukta(
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 4),
-
-        // ── Subtitle ──
-        Text(
-          'Apne mausam ki jankari suniye — bina padhe',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            fontSize: 13,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 24),
-
-        // ── Language Chips ──
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          alignment: WrapAlignment.center,
-          children: VaaniService.supportedLanguages.entries.map((entry) {
-            return _LanguageChip(
-              langCode: entry.key,
-              label: entry.value,
-              onTap: () => _onLanguageSelected(entry.key),
-            );
-          }).toList(),
-        ),
+        const CircularProgressIndicator(),
         const SizedBox(height: 16),
       ],
     );
   }
+
+  // Language chips removed as language is now managed in Settings
 
   /// Speaking mode — waveform + stop button
   Widget _buildSpeakingMode() {
@@ -263,41 +306,3 @@ class _VaaniBottomSheetState extends ConsumerState<VaaniBottomSheet> {
   }
 }
 
-/// Individual language selection chip
-class _LanguageChip extends StatelessWidget {
-  final String langCode;
-  final String label;
-  final VoidCallback onTap;
-
-  const _LanguageChip({
-    required this.langCode,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.primary,
-        side: BorderSide(
-          color: AppColors.primary.withValues(alpha: 0.5),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.labelLarge.copyWith(
-          color: AppColors.primary,
-        ),
-      ),
-    );
-  }
-}

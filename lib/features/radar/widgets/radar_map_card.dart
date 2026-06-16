@@ -48,6 +48,12 @@ class RadarMapCard extends ConsumerWidget {
                         initialZoom: 6.0,
                         minZoom: 3.0,
                         maxZoom: 7.0,
+                        cameraConstraint: CameraConstraint.contain(
+                          bounds: LatLngBounds(
+                            const LatLng(-85, -180),
+                            const LatLng(85, 180),
+                          ),
+                        ),
                         interactionOptions: const InteractionOptions(
                           flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
                         ),

@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/weather_utils.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../../core/utils/unit_converter.dart';
 import '../../../data/models/current_weather.dart';
 import '../../../data/models/daily_forecast.dart';
 import '../../../data/models/location_data.dart';
+import '../../../providers/settings_provider.dart';
 
 /// Large hero card showing current weather conditions (F2)
-class CurrentWeatherCard extends StatelessWidget {
+class CurrentWeatherCard extends ConsumerWidget {
   final CurrentWeather weather;
   final LocationData location;
   final DailyForecast? todayForecast;
@@ -23,7 +26,7 @@ class CurrentWeatherCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -42,15 +45,15 @@ class CurrentWeatherCard extends StatelessWidget {
             const SizedBox(height: 20),
 
             // ── Temperature ──
-            _buildTemperature(context),
+            _buildTemperature(context, ref),
             const SizedBox(height: 8),
 
             // ── Weather Condition ──
-            _buildCondition(),
+            _buildCondition(ref),
             const SizedBox(height: 24),
 
             // ── Detail Chips ──
-            _buildDetailRow(),
+            _buildDetailRow(ref),
           ],
         ),
       ),
@@ -83,7 +86,16 @@ class CurrentWeatherCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTemperature(BuildContext context) {
+  Widget _buildTemperature(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
+    final tempValue = UnitConverter.convertTemp(weather.temperature, settings.tempUnit);
+    final feelsLikeValue = UnitConverter.convertTemp(weather.feelsLike, settings.tempUnit);
+    
+    // For large hero text, don't show C/F, just degree symbol, or show full? The original had just "24°"
+    // Let's show just the degree symbol to keep it clean, or "°F" if requested. Let's use "°" for cleaner look.
+    // Wait, the prompt implies they want to see °F. Let's show the full unit.
+    final tempUnitStr = settings.tempUnit == 'F' ? '°F' : '°C';
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -91,16 +103,18 @@ class CurrentWeatherCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '${weather.temperature.round()}°',
-                style: AppTextStyles.temperature.copyWith(
-                  color: Colors.white,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '$tempValue$tempUnitStr',
+                  style: AppTextStyles.temperature.copyWith(
+                    color: Colors.white,
+                  ),
                 ),
-                overflow: TextOverflow.ellipsis,
-                softWrap: true,
               ),
               Text(
-                'Feels like ${weather.feelsLike.round()}°',
+                'Feels like $feelsLikeValue$tempUnitStr',
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: Colors.white70,
                 ),
@@ -122,11 +136,17 @@ class CurrentWeatherCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCondition() {
+  Widget _buildCondition(WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
+    final tempUnitStr = settings.tempUnit == 'F' ? '°F' : '°C';
     final description = WeatherUtils.getDescription(weather.weatherCode);
-    final highLow = todayForecast != null
-        ? ' · H:${todayForecast!.tempMax.round()}° L:${todayForecast!.tempMin.round()}°'
-        : '';
+    
+    String highLow = '';
+    if (todayForecast != null) {
+      final h = UnitConverter.convertTemp(todayForecast!.tempMax, settings.tempUnit);
+      final l = UnitConverter.convertTemp(todayForecast!.tempMin, settings.tempUnit);
+      highLow = ' · H:$h$tempUnitStr L:$l$tempUnitStr';
+    }
 
     return Text(
       '$description$highLow',
@@ -137,7 +157,11 @@ class CurrentWeatherCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow() {
+  Widget _buildDetailRow(WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
+    final windValue = UnitConverter.convertWindSpeed(weather.windSpeed, settings.windUnit);
+    final windUnitStr = settings.windUnit == 'ms' ? 'm/s' : 'km/h';
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return Wrap(
@@ -146,12 +170,12 @@ class CurrentWeatherCard extends StatelessWidget {
           children: [
             _detailChip(
               Icons.water_drop_outlined,
-              '${weather.humidity}%',
+              '${weather.humidity.round()}%',
               'Humidity',
             ),
             _detailChip(
               Icons.air_rounded,
-              '${weather.windSpeed.round()} km/h',
+              '$windValue $windUnitStr',
               WeatherUtils.getWindDirection(weather.windDirection),
             ),
             if (weather.visibility != null)

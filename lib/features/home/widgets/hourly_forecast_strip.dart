@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/weather_utils.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../../core/utils/unit_converter.dart';
 import '../../../data/models/hourly_forecast.dart';
 import '../../confidence/confidence_badge.dart';
+import '../../../providers/settings_provider.dart';
 
 /// Horizontal scrolling hourly forecast strip with temperature curve (F3)
-class HourlyForecastStrip extends StatelessWidget {
+class HourlyForecastStrip extends ConsumerWidget {
   final List<HourlyForecast> forecasts;
 
   const HourlyForecastStrip({super.key, required this.forecasts});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (forecasts.isEmpty) return const SizedBox.shrink();
+
+    final settings = ref.watch(settingsProvider);
+    final tempUnitStr = settings.tempUnit == 'F' ? '°F' : '°';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +51,7 @@ class HourlyForecastStrip extends StatelessWidget {
           height: 120,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: _buildTemperatureChart(),
+            child: _buildTemperatureChart(settings),
           ),
         ),
         const SizedBox(height: 8),
@@ -58,7 +64,7 @@ class HourlyForecastStrip extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             itemCount: forecasts.length,
             itemBuilder: (context, index) {
-              return _buildHourCard(context, forecasts[index], index);
+              return _buildHourCard(context, forecasts[index], index, settings, tempUnitStr);
             },
           ),
         ),
@@ -66,14 +72,16 @@ class HourlyForecastStrip extends StatelessWidget {
     );
   }
 
-  Widget _buildTemperatureChart() {
+  Widget _buildTemperatureChart(SettingsState settings) {
     // Show every 3rd point for readability
     final spots = <FlSpot>[];
     double minTemp = double.infinity;
     double maxTemp = double.negativeInfinity;
 
     for (var i = 0; i < forecasts.length; i++) {
-      final temp = forecasts[i].temperature;
+      final rawTemp = forecasts[i].temperature;
+      final temp = UnitConverter.convertTemp(rawTemp, settings.tempUnit).toDouble();
+      
       spots.add(FlSpot(i.toDouble(), temp));
       if (temp < minTemp) minTemp = temp;
       if (temp > maxTemp) maxTemp = temp;
@@ -94,8 +102,10 @@ class HourlyForecastStrip extends StatelessWidget {
             getTooltipItems: (spots) {
               return spots.map((spot) {
                 final forecast = forecasts[spot.x.toInt()];
+                final temp = UnitConverter.convertTemp(forecast.temperature, settings.tempUnit);
+                final unitStr = settings.tempUnit == 'F' ? '°F' : '°';
                 return LineTooltipItem(
-                  '${forecast.temperature.round()}° · ${DateFormatter.shortTime(forecast.time)}',
+                  '$temp$unitStr · ${DateFormatter.shortTime(forecast.time)}',
                   AppTextStyles.labelSmall.copyWith(color: Colors.white),
                 );
               }).toList();
@@ -128,9 +138,11 @@ class HourlyForecastStrip extends StatelessWidget {
     );
   }
 
-  Widget _buildHourCard(BuildContext context, HourlyForecast forecast, int index) {
+  Widget _buildHourCard(BuildContext context, HourlyForecast forecast, int index, SettingsState settings, String tempUnitStr) {
     final isNow = DateFormatter.isCurrentHour(forecast.time);
     final hasRain = forecast.precipitationProbability > 30;
+    
+    final tempValue = UnitConverter.convertTemp(forecast.temperature, settings.tempUnit);
 
     return Container(
       width: 72,
@@ -169,7 +181,7 @@ class HourlyForecastStrip extends StatelessWidget {
 
             // Temperature
             Text(
-              '${forecast.temperature.round()}°',
+              '$tempValue$tempUnitStr',
               style: AppTextStyles.labelLarge.copyWith(
                 color: isNow ? AppColors.primary : Theme.of(context).colorScheme.onSurface,
               ),

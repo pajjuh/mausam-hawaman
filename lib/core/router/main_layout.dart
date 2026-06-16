@@ -61,6 +61,10 @@ class MainLayout extends StatelessWidget {
             icon: Icon(Icons.agriculture),
             label: 'Farming',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
         ],
       ),
     );

@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/unit_converter.dart';
 import '../../../data/models/current_weather.dart';
+import '../../../providers/settings_provider.dart';
 
-class CropConditionsCard extends StatefulWidget {
+class CropConditionsCard extends ConsumerStatefulWidget {
   final CurrentWeather currentWeather;
 
   const CropConditionsCard({super.key, required this.currentWeather});
 
   @override
-  State<CropConditionsCard> createState() => _CropConditionsCardState();
+  ConsumerState<CropConditionsCard> createState() => _CropConditionsCardState();
 }
 
-class _CropConditionsCardState extends State<CropConditionsCard> {
+class _CropConditionsCardState extends ConsumerState<CropConditionsCard> {
   String _selectedCrop = 'Wheat';
 
   final List<String> _crops = ['Wheat', 'Rice', 'Cotton', 'Sugarcane', 'Maize'];
 
   String _evaluateCondition() {
+    // The evaluation logic should always use the raw celsius temperature.
     final temp = widget.currentWeather.temperature;
     
     // Simplified logic for demonstration based on general crop temp requirements
@@ -64,6 +68,10 @@ class _CropConditionsCardState extends State<CropConditionsCard> {
   Widget build(BuildContext context) {
     final condition = _evaluateCondition();
     final color = _getConditionColor(condition);
+
+    final settings = ref.watch(settingsProvider);
+    final tempValue = UnitConverter.convertTemp(widget.currentWeather.temperature, settings.tempUnit);
+    final tempUnitStr = settings.tempUnit == 'F' ? '°F' : '°C';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -132,7 +140,7 @@ class _CropConditionsCardState extends State<CropConditionsCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Current Temp: ${widget.currentWeather.temperature.round()}°C',
+                      'Current Temp: $tempValue$tempUnitStr',
                       style: AppTextStyles.bodyMedium,
                       softWrap: true,
                     ),
